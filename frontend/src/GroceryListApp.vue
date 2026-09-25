@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue";
-
-interface Food {
-    id: string;
-    name: string;
-    price: number;
-}
+import type { Food } from "./types";
 
 type SortType = "NAME_ORDER" | "PRICE_ORDER" | "NO_ORDER";
 
