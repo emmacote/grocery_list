@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue";
 import type { Food } from "./types";
+import FoodLine from "./FoodLine.vue";
 
 type SortType = "NAME_ORDER" | "PRICE_ORDER" | "NO_ORDER";
 
@@ -101,7 +102,7 @@ onMounted(()=> {
     <h3>Grocery List</h3>
     <ul>
         <li v-for="food in searchedGroceries" :key="food.id">
-            {{  food.name }} -- {{  toUSCurrency(food.price) }}
+            <FoodLine :food="food"></FoodLine>
             <button @click="deleteFood(food.id)">Delete</button>
         </li>
     </ul>
