@@ -15,7 +15,7 @@ const searchTerm = ref<string>("");
 
 const newFoodText = ref<string>("");
 const newFoodPrice = ref<number>(0.01);
-const currencyFormatter =  Intl.NumberFormat("en-US", {style: "currency", currency: "USD"});
+
 
 
 
@@ -61,9 +61,7 @@ function deleteFood(id: string){
     groceries.value = groceries.value.filter(food=>food.id !== id );
 }
 
-function toUSCurrency(price: number) {
-    return currencyFormatter.format(price);
-}
+
 
 
 watch(groceries, (newGroceries)=> {
@@ -77,6 +75,8 @@ onMounted(()=> {
         groceries.value = JSON.parse(saved);
     }
 });
+
+
 
 </script>
 
@@ -102,8 +102,8 @@ onMounted(()=> {
     <h3>Grocery List</h3>
     <ul>
         <li v-for="food in searchedGroceries" :key="food.id">
-            <FoodLine :food="food"></FoodLine>
-            <button @click="deleteFood(food.id)">Delete</button>
+            <FoodLine :food="food" @deleted="deleteFood"></FoodLine>
+            
         </li>
     </ul>
 </template>
