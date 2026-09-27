@@ -2,6 +2,8 @@
 import { ref, onMounted, watch, computed } from "vue";
 import type { Food } from "./types";
 import FoodLine from "./FoodLine.vue";
+import "bootstrap/dist/css/bootstrap.css"
+import "bootstrap/dist/js/bootstrap.bundle.js"
 
 type SortType = "NAME_ORDER" | "PRICE_ORDER" | "NO_ORDER";
 
@@ -80,30 +82,54 @@ onMounted(()=> {
 
 </script>
 
-<template>
+<template class="container">
+    <div class="row">
+        <div class="col-sm-3"><b>Add food: </b></div>
+        <div class="col-sm-3"><input v-model="newFoodText" placeholder="New food item..." /></div>
+        <div class="col-sm-3"> <b>Add Price: </b></div>
+        <div class="col-sm-3"><input v-model.number="newFoodPrice" placeholder="0.00" /></div>
+    </div>
 
-    <b>Add food: </b><input v-model="newFoodText" placeholder="New food item..." />
-    <b>Add Price: </b> <input v-model.number="newFoodPrice" placeholder="0.00" />
-    <br /><br />
+    <div class="row">
+        <div class="col-sm-12 d-grid gap-2"> <br /><button type="button" class="btn btn-primary" @click="addFood()">Add</button></div>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-12"><hr /></div>
+    </div>
 
-    <button @click="addFood()">Add</button>
-    <br />
-    <b>Grocery List</b><br />
-    <select v-model="selectedOrder">
-        <option value="NO_ORDER">No order</option>
-        <option value="PRICE_ORDER">Price order</option>
-        <option value="NAME_ORDER">Name order</option>
-    </select>
-    <br />
-    <b>Search: </b>
-    <input v-model="searchTerm" type="text"/>
+    <div class="row">
+        <div class="col-sm-3">Order</div>
+         <div class="col-sm-3">
+                <select v-model="selectedOrder">
+                    <option value="NO_ORDER">No order</option>
+                    <option value="PRICE_ORDER">Price order</option>
+                    <option value="NAME_ORDER">Name order</option>
+                </select>
+         </div>
+          <div class="col-sm-3">Search</div>
+        <div class="col-sm-3">
+            <input v-model="searchTerm" type="text"/>
+        </div>
+    </div>
 
-    <br />
-    <h3>Grocery List</h3>
-    <ul>
-        <li v-for="food in searchedGroceries" :key="food.id">
-            <FoodLine :food="food" @deleted="deleteFood"></FoodLine>
-            
-        </li>
-    </ul>
+    <div class="row">
+        <div class="col-sm-12"><hr /></div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <br />
+            <h3>Grocery List</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <ul class="list-group">
+                <li class="list-group-item" v-for="food in searchedGroceries" :key="food.id">
+                    <FoodLine  :food="food" @deleted="deleteFood"></FoodLine>   
+                </li>
+            </ul>
+        </div>
+    </div>
 </template>

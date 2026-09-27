@@ -23,8 +23,11 @@ function deleteFood(){
 </script>
 
 <template>
-    {{  food.name }} -- {{  toUSCurrency(food.price) }}
-    <button @click="deleteFood">Delete</button>
+    <div class="row">
+        <div class="col-sm-4"> {{  food.name }} </div>
+        <div class="col-sm-4">{{  food.price }}</div>
+        <div class="col-sm-4"><button type="button" class="btn btn-danger" @click="deleteFood">Delete</button></div>
+    </div>
 </template>
 
 <style scoped>
