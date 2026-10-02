@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, request
-from flask.app import Flask
 
 import sqlite3
 from sqlite3 import connect, Connection, Cursor
@@ -16,31 +15,40 @@ def db_conn():
         conn = sqlite3.connect("groceries.db")
         csr: Cursor = conn.cursor()
         yield csr
-    except:
-        print(f"Database connection failed.")
-        raise Exception(f"Database connection failed.")
+        conn.commit()
+        csr.close()
+    except Exception as e:
+        if conn is not None:
+            conn.rollback()
+        print(f"Database connection failed: {e}")
+        raise e
     finally:
         if conn:
-            conn.commit()
             conn.close()
 
 
 @app.route("/groceries", methods=["GET"])
 def get_groceries():
-    conn = sqlite3.connect("groceries.db")
-    csr = conn.cursor()
 
     with db_conn() as csr:
         query = "select id, name, price from groceries"
         res = csr.execute(query)
         groceries = [dict(id=id, name=name, price=price) for id, name, price in res.fetchall()]
-        csr.close()
 
     return jsonify(dict(groceries=groceries))
 
 @app.route("/addfood", methods=["POST"])
 def add_food():
-    new_food = request.get_json()
+
+    new_food: Optional[dict] = request.get_json()
+    if new_food is None:
+        return jsonify(error="Missing JSON object. Please send one with (id, name, price)"), 400
+
+    required_fields = "id name price".split(" ")
+    for required_field in required_fields:
+        if required_field not in new_food:
+            return jsonify(error="The Submitted JSON object doesn't have all necessary fields. Required: (id, name, price)"), 400
+
     new_id = new_food["id"]
     new_name = new_food["name"]
     new_price = new_food["price"]
@@ -48,5 +56,7 @@ def add_food():
     with db_conn() as csr:
         query = """insert into groceries(id, name, price) values(?, ?, ?)"""
         csr.execute(query, (new_id, new_name, new_price))
-        csr.close()
-    return "done with adding food"
+
+    return jsonify(status=f"Food added... ({new_id}, {new_name}, {new_price})")
+
+
