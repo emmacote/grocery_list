@@ -59,4 +59,10 @@ def add_food():
 
     return jsonify(status=f"Food added... ({new_id}, {new_name}, {new_price})")
 
+@app.route("/food/<id>", methods=["DELETE"])
+def delete_food(id):
+    delete_query = "delete from groceries where id=?"
+    with db_conn() as csr:
+        csr.execute(delete_query, (id,))
 
+    return jsonify(status=f"Food deleted -- id: {id}")
