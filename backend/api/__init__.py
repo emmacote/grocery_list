@@ -1,6 +1,11 @@
 import sqlite3
 
-conn = sqlite3.connect("groceries.db")
+# TODO: This path setup kind of sucks.
+db_file_name = "groceries.db"
+dir_path  = __file__.rsplit("/", maxsplit=1)[0]
+path_with_name = f"{dir_path}/{db_file_name}"
+print(f"creating db file at path: {path_with_name}")
+conn = sqlite3.connect(path_with_name)
 cursor = conn.cursor()
 
 query_string = """create table if not exists groceries(
