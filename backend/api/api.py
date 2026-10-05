@@ -1,30 +1,10 @@
 from flask import Flask, jsonify, request
 
 import sqlite3
-from sqlite3 import connect, Connection, Cursor
-from contextlib import contextmanager
 from typing import Optional
+from . import db_conn
 
 app: Flask = Flask(__name__)
-
-@contextmanager
-def db_conn():
-    conn: Optional[Connection] = None
-
-    try:
-        conn = sqlite3.connect("groceries.db")
-        csr: Cursor = conn.cursor()
-        yield csr
-        conn.commit()
-        csr.close()
-    except Exception as e:
-        if conn is not None:
-            conn.rollback()
-        print(f"Database connection failed: {e}")
-        raise e
-    finally:
-        if conn:
-            conn.close()
 
 
 @app.route("/groceries", methods=["GET"])
@@ -36,6 +16,7 @@ def get_groceries():
         groceries = [dict(id=id, name=name, price=price) for id, name, price in res.fetchall()]
 
     return jsonify(dict(groceries=groceries))
+
 
 @app.route("/addfood", methods=["POST"])
 def add_food():
@@ -58,6 +39,7 @@ def add_food():
         csr.execute(query, (new_id, new_name, new_price))
 
     return jsonify(status=f"Food added... ({new_id}, {new_name}, {new_price})")
+
 
 @app.route("/food/<id>", methods=["DELETE"])
 def delete_food(id):
