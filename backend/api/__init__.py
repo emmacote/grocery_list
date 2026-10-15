@@ -1,20 +1,20 @@
-import sqlite3
-from sqlite3 import Cursor, Connection
 from contextlib import contextmanager
-from typing import Optional
-
-db_file_name = "groceries.db"
-dir_path  = __file__.rsplit("/", maxsplit=1)[0]
-path_with_name = f"{dir_path}/{db_file_name}"
-print(f"creating db file at path: {path_with_name}")
+import os
+import pymysql
 
 @contextmanager
 def db_conn():
-    conn: Optional[Connection] = None
+    conn = None
 
     try:
-        conn = sqlite3.connect(path_with_name)
-        csr: Cursor = conn.cursor()
+        host = os.environ.get("DB_HOST")
+        user = os.environ.get("DB_USER")
+        pw = os.environ.get("DB_PASSWORD")
+        db_name = os.environ.get("DB_NAME")
+
+
+        conn = pymysql.connect(host=host, user=user, password=pw, database=db_name)
+        csr = conn.cursor()
         yield csr
         conn.commit()
         csr.close()
@@ -28,15 +28,12 @@ def db_conn():
             conn.close()
 
 
-
-conn = sqlite3.connect(path_with_name)
-cursor = conn.cursor()
-
 query_string = """create table if not exists groceries(
-    id text primary key, 
-    name text not null,
-    price numeric not null
+    id VARCHAR(36) primary key, 
+    name VARCHAR(100) not null,
+    price numeric(10,2) not null
 )"""
 
 with db_conn() as csr:
     csr.execute(query_string)
+    print("Database created.")

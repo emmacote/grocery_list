@@ -1,19 +1,21 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
-import sqlite3
 from typing import Optional
 from . import db_conn
 
 app: Flask = Flask(__name__)
-
+CORS(app)
+# a quick test comment.
+junk_var = 3
 
 @app.route("/groceries", methods=["GET"])
 def get_groceries():
 
     with db_conn() as csr:
         query = "select id, name, price from groceries"
-        res = csr.execute(query)
-        groceries = [dict(id=id, name=name, price=price) for id, name, price in res.fetchall()]
+        csr.execute(query)
+        groceries = [dict(id=id, name=name, price=float(price)) for id, name, price in csr.fetchall()]
 
     return jsonify(dict(groceries=groceries))
 
@@ -35,7 +37,7 @@ def add_food():
     new_price = new_food["price"]
 
     with db_conn() as csr:
-        query = """insert into groceries(id, name, price) values(?, ?, ?)"""
+        query = """insert into groceries(id, name, price) values(%s, %s, %s)"""
         csr.execute(query, (new_id, new_name, new_price))
 
     return jsonify(status=f"Food added... ({new_id}, {new_name}, {new_price})")
@@ -43,8 +45,12 @@ def add_food():
 
 @app.route("/food/<id>", methods=["DELETE"])
 def delete_food(id):
-    delete_query = "delete from groceries where id=?"
+    delete_query = "delete from groceries where id=%s"
     with db_conn() as csr:
         csr.execute(delete_query, (id,))
 
     return jsonify(status=f"Food deleted -- id: {id}")
+
+@app.get("/ping")
+def ping():
+    return {"status": "okay for now at least."}
