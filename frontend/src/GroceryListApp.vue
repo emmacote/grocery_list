@@ -24,16 +24,21 @@ const newFoodPrice = ref<number>(0.01);
 
 
 
-function addFood(){
+async function addFood(){
 
     if(newFoodText.value.trim().length > 0){
-        groceries.value.push(
-        {
+        
+        const new_food_ob =  {
             id: Date.now().toString(),
             name: newFoodText.value,
             price: newFoodPrice.value
-        });
+        };
 
+        // groceries.value.push(new_food_ob);
+
+        await axios.post("http://localhost:8080/addfood", new_food_ob);
+        const latest_grocery_data = await axios.get("http://localhost:8080/groceries")
+        groceries.value = latest_grocery_data.data.groceries;
         newFoodText.value = "";
         newFoodPrice.value=0.01;
     }
@@ -60,23 +65,29 @@ const searchedGroceries = computed(()=>{
     return searchFilteredList;
 });
 
-function deleteFood(id: string){    
-    groceries.value = groceries.value.filter(food=>food.id !== id );
+async function deleteFood(id: string){    
+    //groceries.value = groceries.value.filter(food=>food.id !== id );
+    await axios.delete(`http://localhost:8080/food/${id}`);
+    const grocery_res = await axios.get("http://localhost:8080/groceries");
+    groceries.value = grocery_res.data.groceries;
 }
 
 
 
+// watch(groceries, (newGroceries)=> {
+//     localStorage.setItem("groceries", JSON.stringify(newGroceries))
+// }, {deep: true });
 
-watch(groceries, (newGroceries)=> {
-    localStorage.setItem("groceries", JSON.stringify(newGroceries))
-}, {deep: true });
 
+onMounted(async()=> {
+    // const saved = localStorage.getItem("groceries");
+    // if( saved ){
+    //     groceries.value = JSON.parse(saved);
+    // }
 
-onMounted(()=> {
-    const saved = localStorage.getItem("groceries");
-    if( saved ){
-        groceries.value = JSON.parse(saved);
-    }
+    const url = "http://localhost:8080/groceries";
+    const res = await axios.get(url);
+    groceries.value = res.data.groceries;
 });
 
 
