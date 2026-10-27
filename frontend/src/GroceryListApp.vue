@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import type { Food } from "./types";
 import FoodLine from "./FoodLine.vue";
 import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap/dist/js/bootstrap.bundle.js"
-import axios from "axios";
+import axios  from "axios";
+
+const api = axios.create({
+    baseURL: "/api"
+});
 
 type SortType = "NAME_ORDER" | "PRICE_ORDER" | "NO_ORDER";
 
@@ -19,11 +23,6 @@ const searchTerm = ref<string>("");
 const newFoodText = ref<string>("");
 const newFoodPrice = ref<number>(0.01);
 
-
-
-
-
-
 async function addFood(){
 
     if(newFoodText.value.trim().length > 0){
@@ -36,8 +35,8 @@ async function addFood(){
 
         // groceries.value.push(new_food_ob);
 
-        await axios.post("http://localhost:8080/addfood", new_food_ob);
-        const latest_grocery_data = await axios.get("http://localhost:8080/groceries")
+        await api.post("/addfood", new_food_ob);
+        const latest_grocery_data = await api.get("/groceries");
         groceries.value = latest_grocery_data.data.groceries;
         newFoodText.value = "";
         newFoodPrice.value=0.01;
@@ -67,29 +66,16 @@ const searchedGroceries = computed(()=>{
 
 async function deleteFood(id: string){    
     //groceries.value = groceries.value.filter(food=>food.id !== id );
-    await axios.delete(`http://localhost:8080/food/${id}`);
-    const grocery_res = await axios.get("http://localhost:8080/groceries");
+    await api.delete(`/food/${id}`);
+    const grocery_res = await api.get("/groceries");
     groceries.value = grocery_res.data.groceries;
 }
 
 
-
-// watch(groceries, (newGroceries)=> {
-//     localStorage.setItem("groceries", JSON.stringify(newGroceries))
-// }, {deep: true });
-
-
 onMounted(async()=> {
-    // const saved = localStorage.getItem("groceries");
-    // if( saved ){
-    //     groceries.value = JSON.parse(saved);
-    // }
-
-    const url = "http://localhost:8080/groceries";
-    const res = await axios.get(url);
+    const res = await api.get("/groceries");
     groceries.value = res.data.groceries;
 });
-
 
 
 </script>

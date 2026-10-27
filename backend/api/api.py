@@ -1,11 +1,9 @@
 from flask import Flask, jsonify, request
-from flask_cors import CORS
 
 from typing import Optional
 from . import db_conn
 
 app: Flask = Flask(__name__)
-CORS(app)
 # a quick test comment.
 junk_var = 3
 
