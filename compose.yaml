@@ -6,17 +6,14 @@ services:
       DB_NAME: ${MYSQL_DATABASE}
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
-    volumes:
-      - ./backend/api:/app/api
+
     depends_on:
       db:
         condition: service_healthy
-    command: gunicorn --reload -b 0.0.0.0:8000 api.api:app
 
   db:
     image: mysql:8
-    ports:
-      - "127.0.0.1:3306:3306"
+
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -32,8 +29,6 @@ services:
   
   web:
     build: ./frontend
-    ports:
-      - "8080:80"
     depends_on:
       - api
 
