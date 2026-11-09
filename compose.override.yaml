@@ -1,0 +1,12 @@
+services:
+  api:
+    volumes:
+      - ./backend/api:/app/api
+    command: gunicorn --reload -b 0.0.0.0:8000 api.api:app
+  
+  db:
+    ports:
+      - "127.0.0.1:3306:3306"
+  web:
+    ports:
+      - "8080:80"
